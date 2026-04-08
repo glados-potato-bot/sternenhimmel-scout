@@ -127,12 +127,14 @@ async function fetchWithRetry(url, options = {}, retries = 2, delay = 1000) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
       const response = await fetch(url, { ...options, signal: controller.signal });
-      clearTimeout(timeout);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (e) {
+      clearTimeout(timeout);
       if (i === retries) throw e;
       await sleep(delay * (i + 1));
+    } finally {
+      clearTimeout(timeout);
     }
   }
 }
@@ -221,6 +223,7 @@ async function fetchIssPosition() {
       lat: parseFloat(lat.toFixed(4)),
       lon: parseFloat(lon.toFixed(4)),
       altitude: Math.round(alt),
+      velocity: Math.round(velocityEci.speed * 3600),
       timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
@@ -555,9 +558,11 @@ async function refreshData() {
     }
     
     updateDashboard(data);
+    hideSkeletonLoading();
     
   } catch (error) {
     console.error('Refresh failed:', error);
+    hideSkeletonLoading();
     
     // Try cached data
     try {
