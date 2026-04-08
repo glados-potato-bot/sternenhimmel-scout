@@ -13,14 +13,22 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen">
+
   <!-- Header -->
   <header class="p-4 border-b border-white/10">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
         Sternenhimmel Scout
       </h1>
-      <div class="text-sm text-gray-400">
-        <span id="location-name">Mannheim</span> · <span id="timestamp">Lädt...</span>
+      <div class="flex items-center gap-4">
+        <div id="location-display" class="text-sm text-gray-400">
+          <span id="location-name">Standort ermitteln...</span> · <span id="timestamp">–</span>
+        </div>
+        <button onclick="manualRefresh()" class="p-2 hover:bg-white/10 rounded-lg transition" title="Aktualisieren">
+          <svg id="refresh-icon" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
@@ -33,167 +41,175 @@
       <div class="absolute inset-0 bg-gradient-to-br from-violet-900/40 to-cyan-900/40 animate-gradient"></div>
       <div class="relative z-10 text-center">
         <div id="verdict-emoji" class="text-8xl mb-4 animate-pulse">🌌</div>
-        <div id="verdict-label" class="text-5xl font-bold text-white mb-2">GEILO</div>
+        <div id="verdict-label" class="text-5xl font-bold text-white mb-2">Lädt...</div>
         <div class="text-gray-300 mb-6">Tonight's Skies</div>
         <!-- Score Bar -->
         <div class="max-w-md mx-auto">
           <div class="flex justify-between text-sm text-gray-400 mb-1">
             <span>Seeing Score</span>
-            <span id="verdict-score">72</span>
+            <span id="verdict-score">–</span>
           </div>
           <div class="h-3 bg-white/20 rounded-full overflow-hidden">
-            <div id="verdict-bar" class="h-full bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full transition-all duration-1000" style="width: 72%"></div>
+            <div id="verdict-bar" class="h-full bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 2. Aurora Radar -->
-    <div class="dashboard-card rounded-2xl p-6">
-      <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
-        <span>🧭</span> Aurora Radar
-      </h2>
-      <!-- Kp Gauge -->
-      <div class="flex items-center justify-center mb-4">
-        <div class="relative w-32 h-32">
-          <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a3a" stroke-width="10"/>
-            <circle id="kp-ring" cx="50" cy="50" r="45" fill="none" stroke="url(#kp-gradient)" stroke-width="10"
-              stroke-dasharray="283" stroke-dashoffset="226" stroke-linecap="round"
-              class="transition-all duration-1000"/>
-            <defs>
-              <linearGradient id="kp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#22d3ee"/>
-                <stop offset="100%" stop-color="#7c3aed"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="kp-value" class="text-4xl font-bold text-white">3</span>
-            <span class="text-xs text-gray-400">Kp-Index</span>
+    <div id="aurora-card" class="dashboard-card rounded-2xl p-6 relative">
+      <div class="card-content">
+        <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>🧭</span> Aurora Radar
+        </h2>
+        <!-- Kp Gauge -->
+        <div class="flex items-center justify-center mb-4">
+          <div class="relative w-32 h-32">
+            <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a3a" stroke-width="10"/>
+              <circle id="kp-ring" cx="50" cy="50" r="45" fill="none" stroke="url(#kp-gradient)" stroke-width="10"
+                stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round"
+                class="transition-all duration-1000"/>
+              <defs>
+                <linearGradient id="kp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#22d3ee"/>
+                  <stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="kp-value" class="text-4xl font-bold text-white">–</span>
+              <span class="text-xs text-gray-400">Kp-Index</span>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Aurora Probability -->
-      <div class="text-center mb-4">
-        <div class="text-sm text-gray-400">Aurora-Wahrscheinlichkeit</div>
-        <div class="text-3xl font-bold text-violet-400"><span id="aurora-prob">45</span>%</div>
-      </div>
-      <!-- 27-Day Forecast -->
-      <div class="border-t border-white/10 pt-4">
-        <div class="text-xs text-gray-400 mb-2">27-Tage Kp-Vorschau</div>
-        <div id="kp-forecast" class="flex gap-1 items-end justify-center h-12">
-          <!-- Generated by JS -->
+        <!-- Aurora Probability -->
+        <div class="text-center mb-4">
+          <div class="text-sm text-gray-400">Aurora-Wahrscheinlichkeit</div>
+          <div class="text-3xl font-bold text-violet-400"><span id="aurora-prob">–</span>%</div>
         </div>
-        <div class="flex justify-between text-xs text-gray-500 mt-1">
-          <span>Heute</span>
-          <span>+7 Tage</span>
+        <!-- 27-Day Forecast -->
+        <div class="border-t border-white/10 pt-4">
+          <div class="text-xs text-gray-400 mb-2">Kp-Vorschau (7 Tage)</div>
+          <div id="kp-forecast" class="flex gap-1 items-end justify-center h-12">
+            <!-- Generated by JS -->
+          </div>
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Heute</span>
+            <span>+7 Tage</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 3. ISS Scout -->
-    <div class="dashboard-card rounded-2xl p-6">
-      <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
-        <span>🛰️</span> ISS Scout
-      </h2>
-      <!-- Mini Leaflet Map -->
-      <div id="iss-map" class="w-full h-40 rounded-xl mb-4 overflow-hidden"></div>
-      <!-- ISS Data -->
-      <div class="grid grid-cols-2 gap-2 text-sm">
-        <div class="bg-white/5 rounded-lg p-2">
-          <div class="text-gray-400">Breite</div>
-          <div id="iss-lat" class="font-mono text-cyan-300">51.2°</div>
-        </div>
-        <div class="bg-white/5 rounded-lg p-2">
-          <div class="text-gray-400">Länge</div>
-          <div id="iss-lon" class="font-mono text-cyan-300">12.4°</div>
-        </div>
-        <div class="bg-white/5 rounded-lg p-2">
-          <div class="text-gray-400">Höhe</div>
-          <div id="iss-alt" class="font-mono text-cyan-300">420 km</div>
-        </div>
-        <div class="bg-white/5 rounded-lg p-2">
-          <div class="text-gray-400">Geschw.</div>
-          <div id="iss-vel" class="font-mono text-cyan-300">27600 km/h</div>
+    <div id="iss-card" class="dashboard-card rounded-2xl p-6 relative">
+      <div class="card-content">
+        <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>🛰️</span> ISS Scout
+        </h2>
+        <!-- Mini Leaflet Map -->
+        <div id="iss-map" class="w-full h-40 rounded-xl mb-4 overflow-hidden"></div>
+        <!-- ISS Data -->
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-gray-400">Breite</div>
+            <div id="iss-lat" class="font-mono text-cyan-300">–°</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-gray-400">Länge</div>
+            <div id="iss-lon" class="font-mono text-cyan-300">–°</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-gray-400">Höhe</div>
+            <div id="iss-alt" class="font-mono text-cyan-300">– km</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-gray-400">Geschw.</div>
+            <div id="iss-vel" class="font-mono text-cyan-300">– km/h</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 4. Himmel-Quietsch -->
-    <div class="dashboard-card rounded-2xl p-6">
-      <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
-        <span>☁️</span> Himmel-Quietsch
-      </h2>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">Wolkencover</span>
-          <div class="flex items-center gap-2">
-            <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
-              <div id="cloud-bar" class="h-full bg-cyan-400 rounded-full transition-all duration-1000" style="width: 15%"></div>
+    <div id="weather-card" class="dashboard-card rounded-2xl p-6 relative">
+      <div class="card-content">
+        <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>☁️</span> Himmel-Quietsch
+        </h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Wolkencover</span>
+            <div class="flex items-center gap-2">
+              <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
+                <div id="cloud-bar" class="h-full bg-cyan-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
+              </div>
+              <span id="cloud-val" class="text-cyan-300 font-mono w-12 text-right">–</span>
             </div>
-            <span id="cloud-val" class="text-cyan-300 font-mono w-12 text-right">15%</span>
           </div>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">Feuchtigkeit</span>
-          <div class="flex items-center gap-2">
-            <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
-              <div id="humidity-bar" class="h-full bg-violet-400 rounded-full transition-all duration-1000" style="width: 62%"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Feuchtigkeit</span>
+            <div class="flex items-center gap-2">
+              <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
+                <div id="humidity-bar" class="h-full bg-violet-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
+              </div>
+              <span id="humidity-val" class="text-violet-300 font-mono w-12 text-right">–</span>
             </div>
-            <span id="humidity-val" class="text-violet-300 font-mono w-12 text-right">62%</span>
           </div>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">Seeing</span>
-          <div class="flex items-center gap-2">
-            <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
-              <div id="seeing-bar" class="h-full bg-green-400 rounded-full transition-all duration-1000" style="width: 70%"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Seeing</span>
+            <div class="flex items-center gap-2">
+              <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
+                <div id="seeing-bar" class="h-full bg-green-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
+              </div>
+              <span id="seeing-val" class="text-green-300 font-mono w-12 text-right">–"</span>
             </div>
-            <span id="seeing-val" class="text-green-300 font-mono w-12 text-right">2.1"</span>
           </div>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">Temperatur</span>
-          <span id="temp-val" class="text-white font-mono text-xl"><span class="text-2xl">8</span>°C</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">Sichtweite</span>
-          <span id="vis-val" class="text-white font-mono">25 km</span>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Temperatur</span>
+            <span id="temp-val" class="text-white font-mono text-xl">–°C</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Sichtweite</span>
+            <span id="vis-val" class="text-white font-mono">– km</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 5. Mond & Meteor -->
-    <div class="dashboard-card rounded-2xl p-6">
-      <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
-        <span>🌙</span> Mond & Meteor
-      </h2>
-      <!-- Moon Phase -->
-      <div class="flex items-center gap-4 mb-6">
-        <div id="moon-icon" class="text-6xl">🌗</div>
-        <div>
-          <div id="moon-phase" class="text-xl font-bold text-white">Abnehmender Mond</div>
-          <div class="text-sm text-gray-400">Mondphase</div>
-          <div class="text-2xl font-bold text-violet-400 mt-1"><span id="moon-illum">78</span>% beleuchtet</div>
+    <div id="moon-card" class="dashboard-card rounded-2xl p-6 relative">
+      <div class="card-content">
+        <h2 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>🌙</span> Mond & Meteor
+        </h2>
+        <!-- Moon Phase -->
+        <div class="flex items-center gap-4 mb-6">
+          <div id="moon-icon" class="text-6xl">🌑</div>
+          <div>
+            <div id="moon-phase" class="text-xl font-bold text-white">–</div>
+            <div class="text-sm text-gray-400">Mondphase</div>
+            <div class="text-2xl font-bold text-violet-400 mt-1"><span id="moon-illum">–</span>% beleuchtet</div>
+          </div>
         </div>
-      </div>
-      <!-- Moon Times -->
-      <div class="grid grid-cols-2 gap-2 mb-6">
-        <div class="bg-white/5 rounded-lg p-2 text-center">
-          <div class="text-gray-400 text-xs">Mondaufgang</div>
-          <div id="moon-rise" class="font-mono text-cyan-300">19:30</div>
+        <!-- Moon Times -->
+        <div class="grid grid-cols-2 gap-2 mb-6">
+          <div class="bg-white/5 rounded-lg p-2 text-center">
+            <div class="text-gray-400 text-xs">Mondaufgang</div>
+            <div id="moon-rise" class="font-mono text-cyan-300">–</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2 text-center">
+            <div class="text-gray-400 text-xs">Monduntergang</div>
+            <div id="moon-set" class="font-mono text-cyan-300">–</div>
+          </div>
         </div>
-        <div class="bg-white/5 rounded-lg p-2 text-center">
-          <div class="text-gray-400 text-xs">Monduntergang</div>
-          <div id="moon-set" class="font-mono text-cyan-300">06:45</div>
-        </div>
-      </div>
-      <!-- Meteor Showers -->
-      <div class="border-t border-white/10 pt-4">
-        <div class="text-sm text-gray-400 mb-2">Aktive Meteorströme</div>
-        <div id="meteor-list" class="space-y-2">
-          <!-- Generated by JS -->
+        <!-- Meteor Showers -->
+        <div class="border-t border-white/10 pt-4">
+          <div class="text-sm text-gray-400 mb-2">Aktive Meteorströme</div>
+          <div id="meteor-list" class="space-y-2">
+            <!-- Generated by JS -->
+          </div>
         </div>
       </div>
     </div>
@@ -202,8 +218,8 @@
 
   <!-- Footer -->
   <footer class="p-4 text-center text-sm text-gray-500 border-t border-white/10 mt-4">
-    <p>Sternenhimmel Scout · Open-Meteo · NOAA · WhereTheISS.at · NASA</p>
-    <p class="mt-1">Daten werden alle 5 Minuten aktualisiert</p>
+    <p>Sternenhimmel Scout · Open-Meteo · NOAA · WhereTheISS.at</p>
+    <p class="mt-1">Daten werden alle 5 Minuten automatisch aktualisiert</p>
   </footer>
 
   <!-- Leaflet JS -->
