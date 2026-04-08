@@ -93,14 +93,41 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.5);
 }
 
-/* Loading skeleton */
-.skeleton {
-  background: linear-gradient(90deg, #1a1a3a 25%, #2a2a4a 50%, #1a1a3a 75%);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
+/* Skeleton loading for cards */
+.skeleton-card {
+  position: relative;
 }
 
-@keyframes skeleton-loading {
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.05) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 1rem;
+  pointer-events: none;
+}
+
+@keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Card error state */
+.card-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Refresh icon spin */
+.refreshing svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
