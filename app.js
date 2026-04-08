@@ -62,13 +62,13 @@ async function getLocation() {
 
   // 2. Fallback: IP-based via ip-api.com
   try {
-    const response = await fetch('https://ip-api.com/json/', { timeout: 5000 });
+    const response = await fetch('https://ipapi.co/json/', { timeout: 5000 });
     if (response.ok) {
       const data = await response.json();
-      if (data.lat && data.lon) {
+      if (data.latitude && data.longitude) {
         return {
-          lat: data.lat,
-          lon: data.lon,
+          lat: data.latitude,
+          lon: data.longitude,
           name: data.city || 'Dein Standort',
           source: 'ip'
         };
