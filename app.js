@@ -177,20 +177,18 @@ async function fetchAuroraNowcast() {
   }
 }
 
-// Fetch Weather from wttr.in (CORS-enabled alternative to Open-Meteo)
+// Fetch Weather from Open-Meteo (CORS-enabled, free, no API key)
 async function fetchWeather(lat, lon) {
   try {
-    // Get location name for wttr.in
-    const name = lat.toFixed(1) + ',' + lon.toFixed(1);
-    const url = `https://wttr.in/${encodeURIComponent(name)}?format=j1`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,cloud_cover,visibility&timezone=auto`;
     const data = await fetchWithRetry(url);
-    const current = data.current_condition[0];
+    const current = data.current_condition?.[0] || data.current;
     
     return {
-      temperature: Math.round(parseInt(current.temp_C)),
-      humidity: Math.round(parseInt(current.humidity)),
-      cloud_cover: Math.round(parseInt(current.cloudcover)),
-      visibility: Math.round(parseInt(current.visibility) / 1000), // km
+      temperature: Math.round(current.temperature_2m ?? 0),
+      humidity: Math.round(current.relative_humidity_2m ?? 0),
+      cloud_cover: Math.round(current.cloud_cover ?? 0),
+      visibility: Math.round((current.visibility ?? 10000) / 1000), // m → km
       timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
