@@ -392,19 +392,26 @@ function kpToDashoffset(kp) {
 // UPDATE DASHBOARD
 // =============================================
 function updateDashboard(data, errors = {}) {
+  // Helper: safely set textContent
+  const txt = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  // Helper: safely set style.width
+  const wid = (id, val) => { const e = document.getElementById(id); if (e) e.style.width = val; };
+  // Helper: safely set innerHTML
+  const html = (id, val) => { const e = document.getElementById(id); if (e) e.innerHTML = val; };
+
   try {
     // Location & Timestamp
-    document.getElementById('location-name').textContent = data.location.name;
-    document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString('de-DE', {
+    txt('location-name', data.location?.name || 'Unbekannt');
+    txt('timestamp', data.timestamp ? new Date(data.timestamp).toLocaleString('de-DE', {
       day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-    });
+    }) : '–');
 
     // VERDICT
     const verdict = computeVerdict(data);
-    document.getElementById('verdict-emoji').textContent = verdict.emoji;
-    document.getElementById('verdict-label').textContent = verdict.label;
-    document.getElementById('verdict-score').textContent = verdict.score;
-    document.getElementById('verdict-bar').style.width = `${verdict.score}%`;
+    txt('verdict-emoji', verdict.emoji);
+    txt('verdict-label', verdict.label);
+    txt('verdict-score', verdict.score);
+    wid('verdict-bar', `${verdict.score}%`);
 
     // AURORA RADAR - with error handling
     clearCardError('aurora-card');
@@ -412,13 +419,15 @@ function updateDashboard(data, errors = {}) {
     if (auroraCard) auroraCard.classList.remove('opacity-50');
     
     if (data.kp) {
-      document.getElementById('kp-value').textContent = data.kp.current;
-      document.getElementById('kp-ring').style.strokeDashoffset = kpToDashoffset(data.kp.current);
-      document.getElementById('aurora-prob').textContent = Math.round(Math.min(100, data.kp.current * 15));
+      txt('kp-value', data.kp.current);
+      const kpRing = document.getElementById('kp-ring');
+      if (kpRing) kpRing.style.strokeDashoffset = kpToDashoffset(data.kp.current);
+      txt('aurora-prob', Math.round(Math.min(100, data.kp.current * 15)));
     } else {
-      document.getElementById('kp-value').textContent = '–';
-      document.getElementById('kp-ring').style.strokeDashoffset = 283;
-      document.getElementById('aurora-prob').textContent = '–';
+      txt('kp-value', '–');
+      const kpRing = document.getElementById('kp-ring');
+      if (kpRing) kpRing.style.strokeDashoffset = 283;
+      txt('aurora-prob', '–');
       if (auroraCard) auroraCard.classList.add('opacity-50');
       showCardError('aurora-card', 'Kp nicht verfügbar');
     }
@@ -430,15 +439,15 @@ function updateDashboard(data, errors = {}) {
     
     if (data.iss) {
       updateIssMap(data.iss.lat, data.iss.lon);
-      document.getElementById('iss-lat').textContent = `${data.iss.lat.toFixed(2)}°`;
-      document.getElementById('iss-lon').textContent = `${data.iss.lon.toFixed(2)}°`;
-      document.getElementById('iss-alt').textContent = `${data.iss.altitude} km`;
-      document.getElementById('iss-vel').textContent = `${data.iss.velocity.toLocaleString()} km/h`;
+      txt('iss-lat', `${data.iss.lat.toFixed(2)}°`);
+      txt('iss-lon', `${data.iss.lon.toFixed(2)}°`);
+      txt('iss-alt', `${data.iss.altitude} km`);
+      txt('iss-vel', `${data.iss.velocity.toLocaleString()} km/h`);
     } else {
-      document.getElementById('iss-lat').textContent = '–';
-      document.getElementById('iss-lon').textContent = '–';
-      document.getElementById('iss-alt').textContent = '– km';
-      document.getElementById('iss-vel').textContent = '– km/h';
+      txt('iss-lat', '–');
+      txt('iss-lon', '–');
+      txt('iss-alt', '– km');
+      txt('iss-vel', '– km/h');
       if (issCard) issCard.classList.add('opacity-50');
       showCardError('iss-card', 'ISS nicht verfügbar');
     }
@@ -449,23 +458,23 @@ function updateDashboard(data, errors = {}) {
     if (weatherCard) weatherCard.classList.remove('opacity-50');
     
     if (data.weather) {
-      document.getElementById('cloud-bar').style.width = `${data.weather.cloud_cover}%`;
-      document.getElementById('cloud-val').textContent = `${data.weather.cloud_cover}%`;
-      document.getElementById('humidity-bar').style.width = `${data.weather.humidity}%`;
-      document.getElementById('humidity-val').textContent = `${data.weather.humidity}%`;
-      document.getElementById('temp-val').innerHTML = `<span class="text-2xl">${data.weather.temperature}</span>°C`;
-      document.getElementById('vis-val').textContent = `${data.weather.visibility} km`;
+      wid('cloud-bar', `${data.weather.cloud_cover}%`);
+      txt('cloud-val', `${data.weather.cloud_cover}%`);
+      wid('humidity-bar', `${data.weather.humidity}%`);
+      txt('humidity-val', `${data.weather.humidity}%`);
+      html('temp-val', `<span class="text-2xl">${data.weather.temperature}</span>°C`);
+      txt('vis-val', `${data.weather.visibility} km`);
       // Seeing: estimate from visibility (simplified)
       const seeingVal = Math.max(1, (data.weather.visibility / 50) * 4).toFixed(1);
-      document.getElementById('seeing-val').textContent = `${seeingVal}"`;
+      txt('seeing-val', `${seeingVal}"`);
       const seeingBar = Math.min(100, (seeingVal / 4) * 100);
-      document.getElementById('seeing-bar').style.width = `${seeingBar}%`;
+      wid('seeing-bar', `${seeingBar}%`);
     } else {
-      document.getElementById('cloud-val').textContent = '–';
-      document.getElementById('humidity-val').textContent = '–';
-      document.getElementById('temp-val').innerHTML = '–°C';
-      document.getElementById('vis-val').textContent = '– km';
-      document.getElementById('seeing-val').textContent = '–"';
+      txt('cloud-val', '–');
+      txt('humidity-val', '–');
+      html('temp-val', '–°C');
+      txt('vis-val', '– km');
+      txt('seeing-val', '–"');
       if (weatherCard) weatherCard.classList.add('opacity-50');
       showCardError('weather-card', 'Wetter nicht verfügbar');
     }
@@ -476,20 +485,20 @@ function updateDashboard(data, errors = {}) {
     if (moonCard) moonCard.classList.remove('opacity-50');
     
     if (data.moon) {
-      document.getElementById('moon-icon').textContent = data.moon.icon;
-      document.getElementById('moon-phase').textContent = data.moon.name;
-      document.getElementById('moon-illum').textContent = data.moon.illumination;
+      txt('moon-icon', data.moon.icon);
+      txt('moon-phase', data.moon.name);
+      txt('moon-illum', data.moon.illumination);
       // Moon rise/set: rough estimate based on phase
       const moonrise = estimateMoonrise(data.moon.phaseValue);
       const moonset = estimateMoonset(data.moon.phaseValue);
-      document.getElementById('moon-rise').textContent = moonrise;
-      document.getElementById('moon-set').textContent = moonset;
+      txt('moon-rise', moonrise);
+      txt('moon-set', moonset);
     } else {
-      document.getElementById('moon-icon').textContent = '🌑';
-      document.getElementById('moon-phase').textContent = 'Unbekannt';
-      document.getElementById('moon-illum').textContent = '–';
-      document.getElementById('moon-rise').textContent = '–';
-      document.getElementById('moon-set').textContent = '–';
+      txt('moon-icon', '🌑');
+      txt('moon-phase', 'Unbekannt');
+      txt('moon-illum', '–');
+      txt('moon-rise', '–');
+      txt('moon-set', '–');
       if (moonCard) moonCard.classList.add('opacity-50');
       showCardError('moon-card', 'Mond nicht verfügbar');
     }
