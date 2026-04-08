@@ -199,37 +199,20 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Fetch ISS Position using satellite.js with TLE from CORS-enabled API
+// Fetch ISS Position from wheretheiss.at (direct lat/lon, no TLE parsing needed)
 async function fetchIssPosition() {
   try {
-    // Fetch TLE from CORS-enabled source
-    const tleData = await fetchWithRetry('https://tle.ivanstanojevic.me/api/tle/25544');
-    const line1 = tleData.line1;
-    const line2 = tleData.line2;
-    
-    // Parse TLE and compute position
-    const satrec = satellite.twoline2satrec(line1, line2);
-    const positionAndVelocity = satellite.propagate(satrec, new Date());
-    const gmst = satellite.gstime(new Date());
-    const positionEci = positionAndVelocity.position;
-    const velocityEci = positionAndVelocity.velocity;
-    
-    // Convert ECI to geodetic
-    const gdpos = satellite.eciToGeodetic(positionEci, gmst);
-    const lat = satellite.degreesLat(gdpos.lat);
-    const lon = satellite.degreesLong(gdpos.lon);
-    const alt = gdpos.height;
-    
+    const data = await fetchWithRetry('https://api.wheretheiss.at/v1/satellites/25544');
     return {
-      lat: parseFloat(lat.toFixed(4)),
-      lon: parseFloat(lon.toFixed(4)),
-      altitude: Math.round(alt),
-      velocity: Math.round(velocityEci.speed * 3600),
+      lat: parseFloat(data.latitude.toFixed(4)),
+      lon: parseFloat(data.longitude.toFixed(4)),
+      altitude: Math.round(data.altitude),
+      velocity: Math.round(data.velocity * 3.6), // km/h (API returns m/s)
       timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
     console.error('ISS Position fetch failed:', e);
-    return null; // Graceful degradation
+    return null;
   }
 }
 
@@ -340,10 +323,17 @@ function showGlobalError(message = 'Keine Verbindung zu den Datenquellen') {
 }
 
 function showLocationPrompt() {
-  const header = document.querySelector('header');
-  const locationDiv = document.getElementById('location-name')?.parentElement;
-  if (locationDiv) {
-    locationDiv.innerHTML = `<span class="animate-pulse">Standort ermitteln...</span>`;
+  const el = document.getElementById('location-name');
+  if (el) {
+    el.textContent = 'Standort ermitteln...';
+    el.classList.add('animate-pulse');
+  }
+}
+
+function clearLocationPrompt() {
+  const el = document.getElementById('location-name');
+  if (el) {
+    el.classList.remove('animate-pulse');
   }
 }
 
@@ -556,6 +546,13 @@ async function refreshData() {
   
   try {
     const location = await getLocation();
+    // Immediately show the resolved location (before other data loads)
+    const locEl = document.getElementById('location-name');
+    if (locEl) {
+      locEl.textContent = location.name;
+      locEl.classList.remove('animate-pulse');
+    }
+    
     const data = await fetchAllData(location);
     
     cachedData = data;
