@@ -60,15 +60,15 @@ async function getLocation() {
     console.log('Geolocation failed:', geoError.message);
   }
 
-  // 2. Fallback: IP-based via ipapi.co
+  // 2. Fallback: IP-based via ip-api.com
   try {
-    const response = await fetch('https://ipapi.co/json/', { timeout: 5000 });
+    const response = await fetch('http://ip-api.com/json/', { timeout: 5000 });
     if (response.ok) {
       const data = await response.json();
-      if (data.latitude && data.longitude) {
+      if (data.lat && data.lon) {
         return {
-          lat: data.latitude,
-          lon: data.longitude,
+          lat: data.lat,
+          lon: data.lon,
           name: data.city || 'Dein Standort',
           source: 'ip'
         };
