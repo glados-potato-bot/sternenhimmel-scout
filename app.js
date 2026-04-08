@@ -196,16 +196,32 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Fetch ISS Position from pre-computed JSON (updated every 15min by GitHub Actions)
+// Fetch ISS Position using satellite.js with TLE from CORS-enabled API
 async function fetchIssPosition() {
   try {
-    // Fetch from our own hosted JSON (computed by GitHub Actions via ephem)
-    const data = await fetchWithRetry('iss_position.json');
+    // Fetch TLE from CORS-enabled source
+    const tleData = await fetchWithRetry('https://tle.ivanstanojevic.me/api/tle/25544');
+    const line1 = tleData.line1;
+    const line2 = tleData.line2;
+    
+    // Parse TLE and compute position
+    const satrec = satellite.twoline2satrec(line1, line2);
+    const positionAndVelocity = satellite.propagate(satrec, new Date());
+    const gmst = satellite.gstime(new Date());
+    const positionEci = positionAndVelocity.position;
+    const velocityEci = positionAndVelocity.velocity;
+    
+    // Convert ECI to geodetic
+    const gdpos = satellite.eciToGeodetic(positionEci, gmst);
+    const lat = satellite.degreesLat(gdpos.lat);
+    const lon = satellite.degreesLong(gdpos.lon);
+    const alt = gdpos.height;
+    
     return {
-      lat: parseFloat(data.lat.toFixed(4)),
-      lon: parseFloat(data.lon.toFixed(4)),
-      altitude: data.alt_km || 408,
-      timestamp: new Date(data.timestamp).toLocaleTimeString('de-DE')
+      lat: parseFloat(lat.toFixed(4)),
+      lon: parseFloat(lon.toFixed(4)),
+      altitude: Math.round(alt),
+      timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
     console.error('ISS Position fetch failed:', e);
