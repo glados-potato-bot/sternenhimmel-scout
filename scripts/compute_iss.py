@@ -10,9 +10,12 @@ tle_url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=TLE
 response = requests.get(tle_url, timeout=10)
 lines = response.text.strip().split('\n')
 
-# Parse TLE
-tle_line1 = lines[0].strip()
-tle_line2 = lines[1].strip()
+# Parse TLE - find ISS section (skip header lines that don't start with '1 ')
+for i, line in enumerate(lines):
+    if line.startswith('1 ') and '25544' in line:
+        tle_line1 = line.strip()
+        tle_line2 = lines[i+1].strip()
+        break
 
 # Create satellite
 satellite = ephem.readtle('ISS', tle_line1, tle_line2)
