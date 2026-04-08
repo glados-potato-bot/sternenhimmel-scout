@@ -62,7 +62,7 @@ async function getLocation() {
 
   // 2. Fallback: IP-based via ip-api.com
   try {
-    const response = await fetch('http://ip-api.com/json/', { timeout: 5000 });
+    const response = await fetch('https://ip-api.com/json/', { timeout: 5000 });
     if (response.ok) {
       const data = await response.json();
       if (data.lat && data.lon) {
@@ -123,18 +123,19 @@ function computeMoonPhase(date = new Date()) {
 // Helper: fetch with retry
 async function fetchWithRetry(url, options = {}, retries = 2, delay = 1000) {
   for (let i = 0; i <= retries; i++) {
+    let timeoutId;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      timeoutId = setTimeout(() => controller.abort(), 8000);
       const response = await fetch(url, { ...options, signal: controller.signal });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (e) {
-      clearTimeout(timeout);
+      if (timeoutId) clearTimeout(timeoutId);
       if (i === retries) throw e;
       await sleep(delay * (i + 1));
     } finally {
-      clearTimeout(timeout);
+      if (timeoutId) clearTimeout(timeoutId);
     }
   }
 }
