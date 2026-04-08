@@ -376,6 +376,10 @@ function initIssMap() {
 
 function updateIssMap(lat, lon) {
   if (!issMap) initIssMap();
+  if (!isFinite(lat) || !isFinite(lon)) {
+    console.warn('Invalid ISS coordinates:', lat, lon);
+    return;
+  }
   issMap.setView([lat, lon], 3);
   issMarker.setLatLng([lat, lon]);
 }
@@ -437,7 +441,7 @@ function updateDashboard(data, errors = {}) {
     const issCard = document.getElementById('iss-card');
     if (issCard) issCard.classList.remove('opacity-50');
     
-    if (data.iss) {
+    if (data.iss && isFinite(data.iss.lat) && isFinite(data.iss.lon)) {
       updateIssMap(data.iss.lat, data.iss.lon);
       txt('iss-lat', `${data.iss.lat.toFixed(2)}°`);
       txt('iss-lon', `${data.iss.lon.toFixed(2)}°`);
