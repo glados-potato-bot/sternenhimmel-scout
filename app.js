@@ -158,15 +158,14 @@ async function fetchKpIndex() {
   }
 }
 
-// Fetch Aurora Nowcast from NOAA
+// Fetch Aurora Nowcast from NOAA Ovation
 async function fetchAuroraNowcast() {
   try {
-    const data = await fetchWithRetry('https://services.swpc.noaa.gov/json/aurora_nowcast.json');
-    // This is a grid-based forecast, we'll extract some useful info
-    // For now, just return that we have data
+    const data = await fetchWithRetry('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
+    // Data is grid-based [lat, lon, probability], we just confirm availability
     return {
       available: true,
-      dataPoints: data.length,
+      dataPoints: data.coordinates?.length || 0,
       timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
@@ -175,17 +174,20 @@ async function fetchAuroraNowcast() {
   }
 }
 
-// Fetch Weather from Open-Meteo
+// Fetch Weather from wttr.in (CORS-enabled alternative to Open-Meteo)
 async function fetchWeather(lat, lon) {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,cloud_cover,visibility&hourly=cloud_cover&forecast_days=1&timezone=auto`;
+    // Get location name for wttr.in
+    const name = lat.toFixed(1) + ',' + lon.toFixed(1);
+    const url = `https://wttr.in/${encodeURIComponent(name)}?format=j1`;
     const data = await fetchWithRetry(url);
+    const current = data.current_condition[0];
     
     return {
-      temperature: Math.round(data.current.temperature_2m),
-      humidity: Math.round(data.current.relative_humidity_2m),
-      cloud_cover: Math.round(data.current.cloud_cover),
-      visibility: Math.round(data.current.visibility / 1000), // km
+      temperature: Math.round(parseInt(current.temp_C)),
+      humidity: Math.round(parseInt(current.humidity)),
+      cloud_cover: Math.round(parseInt(current.cloudcover)),
+      visibility: Math.round(parseInt(current.visibility) / 1000), // km
       timestamp: new Date().toLocaleTimeString('de-DE')
     };
   } catch (e) {
@@ -194,20 +196,20 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Fetch ISS Position from WhereTheISS.at
+// Fetch ISS Position from open-notify.org (free, CORS-enabled)
 async function fetchIssPosition() {
   try {
-    const data = await fetchWithRetry('https://api.wheretheiss.at/v1/satellites/25544');
+    const data = await fetchWithRetry('http://api.open-notify.org/iss-now.json');
     return {
-      lat: parseFloat(data.latitude.toFixed(4)),
-      lon: parseFloat(data.longitude.toFixed(4)),
-      altitude: Math.round(data.altitude),
-      velocity: Math.round(data.velocity),
+      lat: parseFloat(data.iss_position.latitude.toFixed(4)),
+      lon: parseFloat(data.iss_position.longitude.toFixed(4)),
+      altitude: 408, // km (standard ISS altitude)
+      velocity: 27600, // km/h (approx)
       timestamp: new Date(data.timestamp * 1000).toLocaleTimeString('de-DE')
     };
   } catch (e) {
     console.error('ISS Position fetch failed:', e);
-    return null;
+    return null; // Graceful degradation
   }
 }
 
