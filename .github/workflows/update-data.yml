@@ -22,7 +22,9 @@ jobs:
       - name: Install dependencies
         run: pip install ephem requests
       - name: Fetch data
-        run: python scripts/fetch_data.py
+        run: |
+          python scripts/fetch_data.py
+          python scripts/compute_iss.py
       - name: Commit and push
         run: |
           git config user.name "GitHub Actions"
