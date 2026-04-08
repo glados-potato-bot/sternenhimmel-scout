@@ -196,16 +196,16 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Fetch ISS Position from open-notify.org (free, CORS-enabled)
+// Fetch ISS Position from pre-computed JSON (updated every 15min by GitHub Actions)
 async function fetchIssPosition() {
   try {
-    const data = await fetchWithRetry('http://api.open-notify.org/iss-now.json');
+    // Fetch from our own hosted JSON (computed by GitHub Actions via ephem)
+    const data = await fetchWithRetry('iss_position.json');
     return {
-      lat: parseFloat(data.iss_position.latitude.toFixed(4)),
-      lon: parseFloat(data.iss_position.longitude.toFixed(4)),
-      altitude: 408, // km (standard ISS altitude)
-      velocity: 27600, // km/h (approx)
-      timestamp: new Date(data.timestamp * 1000).toLocaleTimeString('de-DE')
+      lat: parseFloat(data.lat.toFixed(4)),
+      lon: parseFloat(data.lon.toFixed(4)),
+      altitude: data.alt_km || 408,
+      timestamp: new Date(data.timestamp).toLocaleTimeString('de-DE')
     };
   } catch (e) {
     console.error('ISS Position fetch failed:', e);
