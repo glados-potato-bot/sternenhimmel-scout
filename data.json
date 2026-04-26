@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-25T23:23:26.822773Z",
+  "timestamp": "2026-04-26T03:56:37.567470Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -34,24 +34,18 @@
     "seeing": 2.1
   },
   "iss": {
-    "lat": -2.01,
-    "lon": 175.27,
-    "altitude": 425.4,
-    "velocity": 27557
+    "lat": 14.76,
+    "lon": 92.29,
+    "altitude": 424.4,
+    "velocity": 27564
   },
   "moon": {
     "phase": "waxing_gibbous",
-    "illumination": 69,
+    "illumination": 71,
     "rise": "11:40",
-    "set": "02:17"
+    "set": "02:32"
   },
   "meteors": [
-    {
-      "name": "Lyriden",
-      "peak": "2026-04-22",
-      "zhr": 20,
-      "active": true
-    },
     {
       "name": "Eta Aquariiden",
       "peak": "2026-05-06",
