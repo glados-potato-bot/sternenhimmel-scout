@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-06T06:55:54.477514Z",
+  "timestamp": "2026-06-06T09:28:22.467820Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -34,16 +34,16 @@
     "seeing": 2.1
   },
   "iss": {
-    "lat": -1.16,
-    "lon": -5.55,
-    "altitude": 422.3,
-    "velocity": 27565
+    "lat": -37.01,
+    "lon": 173.01,
+    "altitude": 429.7,
+    "velocity": 27553
   },
   "moon": {
     "phase": "waxing_gibbous",
-    "illumination": 71,
+    "illumination": 70,
     "rise": "23:12",
-    "set": "08:50"
+    "set": "10:03"
   },
   "meteors": [
     {
