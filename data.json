@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-23T18:01:25.745866Z",
+  "timestamp": "2026-06-23T20:22:42.637441Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -40,8 +40,8 @@
     "velocity": 27600
   },
   "moon": {
-    "phase": "first_quarter",
-    "illumination": 68,
+    "phase": "waxing_gibbous",
+    "illumination": 69,
     "rise": "13:28",
     "set": "23:40"
   },
