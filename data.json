@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24T11:33:20.746111Z",
+  "timestamp": "2026-06-24T13:54:30.365357Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -41,7 +41,7 @@
   },
   "moon": {
     "phase": "waxing_gibbous",
-    "illumination": 74,
+    "illumination": 75,
     "rise": "13:28",
     "set": "23:58"
   },
