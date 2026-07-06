@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-06T12:27:39.900313Z",
+  "timestamp": "2026-07-06T18:20:37.926888Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -41,7 +41,7 @@
   },
   "moon": {
     "phase": "first_quarter",
-    "illumination": 63,
+    "illumination": 61,
     "rise": "22:03",
     "set": "11:35"
   },
