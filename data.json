@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-19T20:32:30.656036Z",
+  "timestamp": "2026-07-19T21:35:39.187679Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -43,7 +43,7 @@
     "phase": "first_quarter",
     "illumination": 34,
     "rise": "10:00",
-    "set": "21:31"
+    "set": "21:46"
   },
   "meteors": [
     {
