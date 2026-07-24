@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-24T22:42:53.291790Z",
+  "timestamp": "2026-07-24T23:46:02.495374Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -43,7 +43,7 @@
     "phase": "waxing_gibbous",
     "illumination": 81,
     "rise": "15:59",
-    "set": "23:21"
+    "set": "00:06"
   },
   "meteors": [
     {
