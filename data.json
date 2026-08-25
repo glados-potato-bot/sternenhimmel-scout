@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-24T23:48:03.356848Z",
+  "timestamp": "2026-08-25T01:25:37.697015Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -34,22 +34,22 @@
     "seeing": 2.1
   },
   "iss": {
-    "lat": -34.86,
-    "lon": -157.48,
-    "altitude": 433.1,
-    "velocity": 27537
+    "lat": -45.32,
+    "lon": -162.77,
+    "altitude": 438.0,
+    "velocity": 27526
   },
   "moon": {
     "phase": "waxing_gibbous",
     "illumination": 90,
     "rise": "17:03",
-    "set": "01:02"
+    "set": "02:15"
   },
   "meteors": [
     {
-      "name": "Perseiden",
-      "peak": "2026-08-12",
-      "zhr": 100,
+      "name": "Lyriden",
+      "peak": "2026-04-22",
+      "zhr": 20,
       "active": true
     }
   ]
