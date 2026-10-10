@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-10T08:32:12.475138Z",
+  "timestamp": "2026-10-10T14:46:25.704924Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -34,10 +34,10 @@
     "seeing": 2.1
   },
   "iss": {
-    "lat": 50.48,
-    "lon": 50.53,
-    "altitude": 429.7,
-    "velocity": 27569
+    "lat": 47.24,
+    "lon": -30.32,
+    "altitude": 428.5,
+    "velocity": 27571
   },
   "moon": {
     "phase": "new_moon",
