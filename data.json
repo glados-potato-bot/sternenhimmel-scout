@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-05T19:00:49.566145Z",
+  "timestamp": "2026-11-06T00:17:41.723343Z",
   "location": {
     "lat": 49.5,
     "lon": 8.46,
@@ -34,14 +34,14 @@
     "seeing": 2.1
   },
   "iss": {
-    "lat": 15.47,
-    "lon": 1.71,
-    "altitude": 414.8,
-    "velocity": 27602
+    "lat": 9.47,
+    "lon": 81.06,
+    "altitude": 424.0,
+    "velocity": 27563
   },
   "moon": {
     "phase": "waxing_crescent",
-    "illumination": 12,
+    "illumination": 10,
     "rise": "01:57",
     "set": "14:24"
   },
@@ -50,6 +50,12 @@
       "name": "Orioniden",
       "peak": "2026-10-21",
       "zhr": 20,
+      "active": true
+    },
+    {
+      "name": "Leoniden",
+      "peak": "2026-11-17",
+      "zhr": 15,
       "active": true
     }
   ]
